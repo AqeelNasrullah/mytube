@@ -1,0 +1,19 @@
+
+.header {border-bottom: 1px solid lightgray;}
+.avatar {width: 43px;height: 43px;border-radius: 100%;overflow: hidden;}
+
+.side-menu {width: 0px;display: none;height: 100vh;background-color: white;overflow-y: auto;}
+.side-menu ul {padding: 0px;margin: 0px;}
+.side-menu ul li {font-size: large;}
+.side-menu ul li:hover {background-color: rgba(245,245,245,1.00);}
+.side-menu ul li a > span {margin-right: 8px;}
+
+.content {background-color: rgba(245,245,245,1.00);width: 100%;overflow-y: auto;}
+
+.pro-dropdown > a {font-size: large !important;}
+
+@media screen and (max-width: 769px) {
+    .upload-txt {display: none !important;}
+    .search-icon {display: block !important;}
+    .search-box {display: none !important;}
+}
