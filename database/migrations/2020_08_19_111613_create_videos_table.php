@@ -20,7 +20,7 @@ class CreateVideosTable extends Migration
             $table->string('thumbnail');
             $table->string('title');
             $table->string('slug');
-            $table->longText('description');
+            $table->longText('description')->nullable();
 
             $table->bigInteger('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories');

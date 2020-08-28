@@ -32,10 +32,10 @@ class Video extends Model
         return $this->hasMany(Comment::class);
     }
 
-    // Video has many histories
-    public function histories()
+    // Video belongs to many users
+    public function manyUsers()
     {
-        return $this->hasMany(History::class);
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 
     // Video has many likes

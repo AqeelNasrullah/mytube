@@ -16,10 +16,10 @@
             <div class="float-left" style="margin-top: 16px;"><h1 class="fw">{{ $channel->name }}</h1></div>
         </div>
         <div>
-            @if ($channel->user_id == auth()->user()->id)
-            <a href="" class="btn btn-lg btn-primary text-uppercase" style="margin-top: 14px;">Customize Channel</a>
+            @if ($channel->user_id == (auth()->check() ? auth()->user()->id : 3))
+            <a href="{{ route('channel.edit', base64_encode(($channel->id * 1234554321) / 67890)) }}" class="btn btn-lg btn-primary text-uppercase" style="margin-top: 14px;">Customize Channel</a>
             @else
-            <button class="btn btn-danger btn-lg text-uppercase" style="margin-top: 14px;">Subscribe</button>
+            <button class="btn subscribe btn-lg text-uppercase {{ auth()->user()->manyChannels()->where('channel_id', $channel->id)->first() ? 'btn-secondary' : 'btn-danger' }}" data-id="{{ $channel->id }}" style="margin-top: 14px;">{{ auth()->user()->manyChannels()->where('channel_id', $channel->id)->first() ? 'Subscribed' : 'Subscribe' }}</button>
             @endif
         </div>
     </div>
@@ -27,10 +27,11 @@
 <nav class="channel-nav">
     <div class="container">
         <ul class="p-0 m-0">
-            <li><a href="">Videos</a></li>
-            <li><a href="">Discussion</a></li>
+            <li><a href="{{ route('channel.show', base64_encode(($channel->id * 1234554321) / 67890)) }}">Videos</a></li>
+            @if ($channel->user_id == (auth()->check() ? auth()->user()->id : 3))
+            @endif
             <li><a href="{{ route('channel.about', base64_encode(($channel->id * 1234554321) / 67890)) }}">About</a></li>
-            @if ($channel->user_id == auth()->user()->id)
+            @if ($channel->user_id == (auth()->check() ? auth()->user()->id : 3))
             <li><a href="{{ route('channel.settings', base64_encode(($channel->id * 1234554321) / 67890)) }}">Settings</a></li>
             @endif
         </ul>

@@ -22,11 +22,11 @@
                     <div class="float-left">
                         <h2 class="fw">{{ auth()->user()->channel->name }}</h2>
                         <h4 class="fw">{{ auth()->user()->email }}</h4>
-                        <a href="">Edit Profile</a>
+                        <a href="{{ route('channel.edit', base64_encode(($channel->id * 1234554321) / 67890)) }}">Edit Channel Info</a>
                     </div>
                     <br class="clear">
                 </div>
-                <h5 class="fw"><a href="">Manage or Customize Channel</a></h5>
+                <h5 class="fw"><a href="{{ route('channel.edit', base64_encode(($channel->id * 1234554321) / 67890)) }}">Manage or Customize Channel</a></h5>
                 <hr>
                 <h1 class="mb-3">Your Account</h1>
                 <h4 class="fw mb-3"><span class="mr-5">Membership</span> No membership | <a href="">Get {{ config('app.name') }} Premium</a></h4>

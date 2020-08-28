@@ -53,6 +53,12 @@ class User extends Authenticatable
         return $this->hasOne(Channel::class);
     }
 
+    // User belongs to many channels
+    public function manyChannels()
+    {
+        return $this->belongsToMany(Channel::class)->withTimestamps();
+    }
+
     // User has many videos
     public function videos()
     {
@@ -71,10 +77,10 @@ class User extends Authenticatable
         return $this->hasMany(Reply::class);
     }
 
-    // User has many histories
-    public function histories()
+    // User belongs to many videos
+    public function manyVideos()
     {
-        return $this->hasMany(History::class);
+        return $this->belongsToMany(Video::class)->withTimestamps();
     }
 
     // User has many likes

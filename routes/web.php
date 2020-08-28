@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 // Main Routes
 Route::get('/', 'HomeController@index')->name('home.index');
+Route::get('search', 'HomeController@search')->name('home.search');
 
 // Login Routes
 Route::get('login', 'LoginController@index')->name('login.index');
@@ -33,12 +34,55 @@ Route::get('resend-email/{id}', 'VerifyEmailController@resendEmail')->name('veri
 Route::get('channel/create', 'ChannelController@create')->name('channel.create');
 Route::post('channel/create', 'ChannelController@store')->name('channel.store');
 Route::get('channel/{id}', 'ChannelController@show')->name('channel.show');
+Route::get('channel/{id}/edit', 'ChannelController@edit')->name('channel.edit');
+Route::put('channel/{id}/edit', 'ChannelController@update')->name('channel.update');
 Route::delete('channel/{id}', 'ChannelController@destroy')->name('channel.destroy');
 Route::get('channel/{id}/about', 'ChannelController@about')->name('channel.about');
 Route::get('channel/{id}/settings', 'ChannelController@settings')->name('channel.settings');
 
+Route::get('channel/subscribe', function () {
+    return redirect()->route('home.index');
+});
+Route::post('channel/subscribe', 'ChannelController@subscribe')->name('channel.subscribe');
+
+// Video Routes
+Route::get('video/upload', 'VideoController@create')->name('video.create');
+Route::get('video/uploaded', function () {
+    return redirect()->route('video.create');
+});
+Route::post('video/uploaded', 'VideoController@uploadVideo')->name('video.uploadVideo');
+Route::post('video/upload', 'VideoController@store')->name('video.store');
+Route::get('video/{video:slug}', 'VideoController@show')->name('video.show');
+Route::get('video/{video:slug}/edit', 'VideoController@edit')->name('video.edit');
+Route::get('video/updated', function () {
+    return redirect()->route('home.index');
+});
+Route::post('video/updated', 'VideoController@updateVideo')->name('video.updateVideo');
+Route::put('video/{video:slug}/edit', 'VideoController@update')->name('video.update');
+Route::delete('video/{video:slug}', 'VideoController@destroy')->name('video.destroy');
+
+// Comments Routes
+Route::get('comments/create', function () {
+    return redirect()->route('home.index');
+});
+Route::post('comments/create', 'CommentController@store')->name('comment.store');
+Route::get('comments/delete', function () {
+    return redirect()->route('home.index');
+});
+Route::post('comments/delete', 'CommentController@destroy')->name('comment.destroy');
+
+// Replies Routes
+Route::get('replies/create', function () {
+    return redirect()->route('home.index');
+});
+Route::post('replies/create', 'ReplyController@store')->name('reply.store');
+Route::get('replies/delete', function () {
+    return redirect()->route('home.index');
+});
+Route::post('replies/delete', 'ReplyController@destroy')->name('reply.destroy');
 
 // Role, Category and Country routes
+Route::get('guest/add', 'HomeController@guest');
 Route::get('roles/add', 'HomeController@roles');
 Route::get('countries/add', 'HomeController@countries');
 Route::get('categories/add', 'HomeController@categories');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Channel;
 use App\Country;
 use App\User;
+use App\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -12,8 +13,8 @@ use Illuminate\Support\Facades\Validator;
 class ChannelController extends Controller
 {
     public function __construct() {
-        $this->middleware('auth');
-        $this->middleware('verify.email');
+        $this->middleware('auth', ['except' => ['show', 'about']]);
+        $this->middleware('verify.email', ['except' => ['show', 'about']]);
     }
 
     /**
@@ -100,7 +101,8 @@ class ChannelController extends Controller
         if ($id) {
             $d_id = (base64_decode($id) * 67890) / 1234554321;
             $channel = Channel::find($d_id);
-            return view('channel.show', ['channel' => $channel]);
+            $videos = $channel->user->videos()->latest()->paginate(10);
+            return view('channel.show', ['channel' => $channel, 'videos' => $videos]);
         }
     }
 
@@ -110,9 +112,14 @@ class ChannelController extends Controller
      * @param  \App\Channel  $channel
      * @return \Illuminate\Http\Response
      */
-    public function edit(Channel $channel)
+    public function edit($id)
     {
-        //
+        if ($id) {
+            $d_id = (base64_decode($id) * 67890) / 1234554321;
+            $channel = Channel::find($d_id);
+            $countries = Country::all();
+            return view('channel.edit', ['channel' => $channel, 'countries' => $countries]);
+        }
     }
 
     /**
@@ -122,9 +129,51 @@ class ChannelController extends Controller
      * @param  \App\Channel  $channel
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Channel $channel)
+    public function update(Request $request, $id)
     {
-        //
+        if ($id) {
+            $rules = [
+                'avatar'                    =>      'nullable|max:2048|mimes:png,jpeg,jpg,gif,webp',
+                'name'                      =>      'required|min:3',
+                'phone_number'              =>      'required|min:6',
+                'address'                   =>      'required|min:6',
+                'city'                      =>      'required|min:2',
+                'state'                     =>      'required|min:2',
+                'postal_code'               =>      'required|numeric',
+                'country'                   =>      'required'
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return back()->withErrors($validator);
+            } else {
+                $d_id = (base64_decode($id) * 67890) / 1234554321;
+                $channel = Channel::find($d_id);
+                $filename = $channel->avatar;
+                if ($request->hasFile('avatar')) {
+                    if ($channel->avatar !== 'user.webp') {
+                        unlink(public_path('images/avatars/' . $channel->avatar));
+                    }
+                    $avatar = $request->file('avatar');
+                    $filename = 'MyTube_' . date('Y-m-d_H_i_s') . '.' . $avatar->getClientOriginalExtension();
+                    $avatar->move(public_path('images/avatars'), $filename);
+                }
+                $updated = $channel->update([
+                    'avatar'                =>      $filename,
+                    'name'                  =>      $request->get('name'),
+                    'phone_number'          =>      $request->get('phone_number'),
+                    'address'               =>      $request->get('address'),
+                    'city'                  =>      $request->get('city'),
+                    'state'                 =>      $request->get('state'),
+                    'postal_code'           =>      $request->get('postal_code'),
+                    'country'               =>      $request->get('country')
+                ]);
+                if ($updated) {
+                    return redirect()->route('channel.about', base64_encode(($channel->id * 1234554321) / 67890))->with('success', 'Channel info updated successfully.');
+                } else {
+                    return back()->with('error', 'An error occured while updating channel info.');
+                }
+            }
+        }
     }
 
     /**
@@ -156,7 +205,16 @@ class ChannelController extends Controller
         if ($id) {
             $d_id = (base64_decode($id) * 67890) / 1234554321;
             $channel = Channel::find($d_id);
-            return view('channel.about', ['channel' => $channel]);
+
+            $videos = $channel->user->videos()->get();
+            $views = 0;
+
+            foreach ($videos as $video) {
+                $vid_views = $video->manyUsers()->count();
+                $views += $vid_views;
+            }
+
+            return view('channel.about', ['channel' => $channel, 'views' => $views]);
         }
     }
 
@@ -170,6 +228,27 @@ class ChannelController extends Controller
                 return view('channel.settings', ['channel' => $channel]);
             } else {
                 return redirect()->route('home.index');
+            }
+        }
+    }
+
+    // Channel Subscribe
+    public function subscribe(Request $request)
+    {
+        if ($request->ajax()) {
+            $channel_id = $request->get('channel_id');
+            if (Auth::user()->manyChannels()->where('channel_id', $channel_id)->first()) {
+                Auth::user()->manyChannels()->detach($channel_id);
+                $toast = '<div class="toast bg-success" id="comment-toast">
+                <div class="toast-body text-light">Channel unsubscribed successfully.</div>
+            </div>';
+                return response()->json(['toast' => $toast, 'status' => 'unsubscribed']);
+            } else {
+                Auth::user()->manyChannels()->attach($channel_id);
+                $toast = '<div class="toast bg-success" id="comment-toast">
+                    <div class="toast-body text-light">Channel subscribed successfully.</div>
+                </div>';
+                return response()->json(['toast' => $toast, 'status' => 'subscribed']);
             }
         }
     }

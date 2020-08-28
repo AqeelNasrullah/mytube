@@ -3,15 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Channel;
 use App\Country;
 use App\Role;
+use App\User;
+use App\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return view('welcome');
+        $videos = Video::where('status', 'public')->inRandomOrder()->limit(20)->get();
+        return view('welcome', ['videos' => $videos]);
+    }
+
+    // Search Page
+    public function search(Request $request)
+    {
+        if ($request->has('search')) {
+            $query = $request->get('search');
+            if ($query) {
+                $channels = Channel::where('name', 'like', '%' . $query . '%')->get();
+                $videos = Video::where('title', 'like', '%' . $query . '%')->where('status', 'public')->get();
+                return view('search', ['channels' => $channels, 'videos' => $videos, 'query' => $query]);
+            } else {
+                return back()->with('error', 'Search field should not be empty.');
+            }
+        } else {
+            return redirect()->route('home.index');
+        }
     }
 
 
@@ -24,10 +46,25 @@ class HomeController extends Controller
 
 
 
-
     /**
-     * Role, Category and Country
+     * Guest, Role, Category and Country
      */
+
+    public function guest()
+    {
+        $user = User::create([
+            'name'              =>      'Guest User',
+            'email'             =>      'guest@mytube.com',
+            'password'          =>      Hash::make('password'),
+            'role_id'           =>      4,
+            'status'            =>      'verified'
+        ]);
+        if ($user) {
+            echo 'Guest User Created';
+        } else {
+            echo 'Something went wrong.';
+        }
+    }
 
     public function roles()
     {

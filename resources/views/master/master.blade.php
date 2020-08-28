@@ -26,6 +26,10 @@
 
 <body>
     <main>
+        <section id="toast" style="position: absolute;z-index: 10000;top: 10px;right: 10px;">
+
+        </section>
+
         <header class="header p-2 d-flex"
             style="justify-content: space-between;position: sticky;top:0px;background-color: white;z-index: 100;">
             <div>
@@ -38,11 +42,11 @@
             </div>
 
             <div class="search-box">
-                <form action="" method="post">
+                <form action="{{ route('home.search') }}" method="get">
                     @csrf
                     <div class="input-group">
                         <input type="text" name="search" id="search" placeholder="Search" class="form-control"
-                            style="width: 375px;height: 42px;font-size: medium;border-radius: 2px;">
+                            style="width: 375px;height: 42px;font-size: medium;border-radius: 2px;" value="{{ $query ?? '' }}">
                         <div class="input-group-append">
                             <button type="submit" class="btn btn-block btn-secondary"
                                 style="width: 75px;border-radius: 2px;border-top-left-radius: 0px;border-bottom-left-radius: 0px; background: rgba(245,245,245,1.00) !important;color: gray;border: 1px solid lightgray;"><i
@@ -59,7 +63,7 @@
                 </div>
                 @auth
                     <div class="float-left">
-                        <h5 class="mb-0 float-left mr-3" style="margin-top: 11.5px;"><a href="" class="text-dark"><i
+                        <h5 class="mb-0 float-left mr-3" style="margin-top: 11.5px;"><a href="{{ route('video.create') }}" class="text-dark"><i
                                     class="fas fa-upload"></i> <span class="upload-txt">Upload</span></a></h5>
                         <div class="dropdown float-left">
                             <div class="avatar" style="cursor: pointer;" data-toggle="dropdown"><img
@@ -159,6 +163,8 @@
     <script src="{{ asset('js/fontawesome.min.js') }}"></script>
     <script>
         $(document).ready(function() {
+            $('.toast').toast({ delay : 5000 });
+            $('.toast').toast('show');
             $('#navicon').click(function() {
                 if ($('.side-menu').outerWidth() == 0) {
                     $('.side-menu').css({

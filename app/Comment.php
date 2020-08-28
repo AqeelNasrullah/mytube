@@ -15,9 +15,9 @@ class Comment extends Model
      */
 
     // Comment belongs to user
-    public function comment()
+    public function user()
     {
-        return $this->belongsTo(Comment::class);
+        return $this->belongsTo(User::class);
     }
 
     // Comment belongs to video

@@ -120,7 +120,7 @@ class VerifyEmailController extends Controller
                 if ($updated) {
                     Mail::to($user->email)->send(new VerifyEmailMail([
                         'email'                 =>      $user->email,
-                        'user'                  =>      $id,
+                        'user'                  =>      $d_id,
                         'key'                   =>      $key
                     ]));
                     return redirect()->route('register.index')->with('success', 'An email sent to <strong>' . $user->email . '</strong>. Click on link to verify your email.<br><strong>Note:</strong> Link is only valid for one hour.');

@@ -10,6 +10,9 @@
 
         <div class="container-fluid py-3">
             <div class="container">
+
+                @include('components.success')
+
                 <div class="row">
                     <main class="col-md-9">
                         <div class="details">
@@ -22,7 +25,8 @@
                     <aside class="col-md-3">
                         <h3 class="mb-3">Stats</h3>
                         <p class="mb-2"><strong>Joined:</strong> {{ date('F d, Y', strtotime($channel->created_at)) }}</p>
-                        <p class="mb-2">{{ 1234567890 }} Views</p>
+                        <p class="mb-2">{{ $views ?? 0 }} Views</p>
+                        <p class="mb-2">{{ $subscribers ?? 0 }} Subscribers</p>
                     </aside>
                 </div>
             </div>

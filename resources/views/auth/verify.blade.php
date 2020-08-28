@@ -40,7 +40,7 @@
             <div>
                 <h1 class="text-center text-danger" style="font-size: 75px;"><i class="fas fa-times-circle"></i></h1>
                 <h3 class="text-center mb-5">Verification Link Expired</h3>
-                @if (!auth()->user()->status == 'unverified')
+                @if (auth()->user()->status == 'unverified')
                 <p class="text-center"><a href="{{ route('verifyEmail.resendEmail', base64_encode((auth()->user()->id * 1234554321) / 67890)) }}" class="btn btn-danger btn-lg">Resend Verification Link</a></p>
                 @endif
             </div>

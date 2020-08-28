@@ -103,7 +103,7 @@
                     </div>
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-danger float-right">Create Profile</button>
+                    <button type="submit" class="btn btn-danger float-right">Create Channel</button>
                     <br class="clear">
                 </div>
             </form>
