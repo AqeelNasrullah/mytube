@@ -22,10 +22,9 @@
                                     <h1 class="fw"><a class="text-dark"
                                             href="{{ route('channel.show', base64_encode(($channel->id * 1234554321) / 67890)) }}">{{ $channel->name }}</a>
                                     </h1>
-                                    <h5>{{ $subscribers ?? 0 }} Subscribers |
-                                        {{ App\Video::where('user_id', $channel->user->id)->count() ?? 0 }} Videos</h5>
+                                    <h5>{{ $channel->manyUsers()->count() ?? 0 }} Subscribers |
+                                        {{ $channel->user->videos()->count() ?? 0 }} Videos</h5>
                                 </div>
-                                <div class="col-2"><button class="btn btn-lg btn-danger text-uppercase">Subscribe</button></div>
                             </div>
                         @endforeach
                     </div>

@@ -18,17 +18,19 @@
                 </div>
                 <div class="col-12 col-sm col-md-7">
                     <a href="{{ route('video.show', $video->slug) }}"><h2 class="fw text-dark mb-2">{{ $video->title }}</h2></a>
-                    <h5 class="mb-0 text-dark">{{ $video->manyUsers()->count() ?? 0 }} Views | {{ $video->created_at->diffForHumans() }} {!! (auth()->check() ? auth()->user()->id : 3) == $channel->user_id ? '| <i class="fas fa-eye"></i> ' . (($video->status) == 'public' ? 'Public' : 'Private') : '' !!}</h5>
+                    <h5 class="mb-0 text-dark">{{ $video->manyUsers()->count() ?? 0 }} Views | {{ $video->created_at->diffForHumans() }} {!! auth()->check() ? (auth()->user()->id == $channel->user_id ? '| <i class="fas fa-eye"></i> ' . (($video->status) == 'public' ? 'Public' : 'Private') : '') : '' !!}</h5>
                 </div>
                 <div class="col-12 col-sm-12 col-md-2 text-center">
-                    @if ((auth()->check() ? auth()->user()->id : 3) == $channel->user_id)
-                    <a href="{{ route('video.edit', $video->slug) }}" class="d-inline text-success text-large mr-3" title="Edit"><i class="fas fa-edit"></i></a>
-                    <form action="{{ route('video.destroy', $video->slug) }}" method="post" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-link p-0 m-0 delete-video text-large text-danger" title="Delete"><i class="fas fa-trash"></i></button>
-                    </form>
-                    @endif
+                    @auth
+                        @if ((auth()->check() ? auth()->user()->id : 3) == $channel->user_id)
+                        <a href="{{ route('video.edit', $video->slug) }}" class="d-inline text-success text-large mr-3" title="Edit"><i class="fas fa-edit"></i></a>
+                        <form action="{{ route('video.destroy', $video->slug) }}" method="post" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-link p-0 m-0 delete-video text-large text-danger" title="Delete"><i class="fas fa-trash"></i></button>
+                        </form>
+                        @endif
+                    @endauth
                 </div>
                 </div>
             @empty
