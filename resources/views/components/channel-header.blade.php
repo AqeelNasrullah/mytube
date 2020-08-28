@@ -19,7 +19,7 @@
             @if ($channel->user_id == (auth()->check() ? auth()->user()->id : 3))
             <a href="{{ route('channel.edit', base64_encode(($channel->id * 1234554321) / 67890)) }}" class="btn btn-lg btn-primary text-uppercase" style="margin-top: 14px;">Customize Channel</a>
             @else
-            <button class="btn subscribe btn-lg text-uppercase {{ auth()->user()->manyChannels()->where('channel_id', $channel->id)->first() ? 'btn-secondary' : 'btn-danger' }}" data-id="{{ $channel->id }}" style="margin-top: 14px;">{{ auth()->user()->manyChannels()->where('channel_id', $channel->id)->first() ? 'Subscribed' : 'Subscribe' }}</button>
+            <button class="btn subscribe btn-lg text-uppercase {{ auth()->user()->manyChannels()->where('channel_id', $channel->id)->first() ? 'btn-secondary subscribed' : 'btn-danger' }}" data-id="{{ $channel->id }}" style="margin-top: 14px;">{{ auth()->user()->manyChannels()->where('channel_id', $channel->id)->first() ? 'Subscribed' : 'Subscribe' }}</button>
             @endif
         </div>
     </div>

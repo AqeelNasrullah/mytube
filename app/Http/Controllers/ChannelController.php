@@ -237,18 +237,21 @@ class ChannelController extends Controller
     {
         if ($request->ajax()) {
             $channel_id = $request->get('channel_id');
+            $channel = Channel::find($channel_id);
             if (Auth::user()->manyChannels()->where('channel_id', $channel_id)->first()) {
                 Auth::user()->manyChannels()->detach($channel_id);
                 $toast = '<div class="toast bg-success" id="comment-toast">
-                <div class="toast-body text-light">Channel unsubscribed successfully.</div>
-            </div>';
-                return response()->json(['toast' => $toast, 'status' => 'unsubscribed']);
+                    <div class="toast-body text-light">Channel unsubscribed successfully.</div>
+                </div>';
+                $subscribers = $channel->manyUsers()->count();
+                return response()->json(['toast' => $toast, 'status' => 'unsubscribed', 'count' => $subscribers]);
             } else {
                 Auth::user()->manyChannels()->attach($channel_id);
                 $toast = '<div class="toast bg-success" id="comment-toast">
                     <div class="toast-body text-light">Channel subscribed successfully.</div>
                 </div>';
-                return response()->json(['toast' => $toast, 'status' => 'subscribed']);
+                $subscribers = $channel->manyUsers()->count();
+                return response()->json(['toast' => $toast, 'status' => 'subscribed', 'count' => $subscribers]);
             }
         }
     }

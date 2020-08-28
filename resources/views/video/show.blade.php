@@ -40,14 +40,16 @@
                                         </div>
                                         <div class="float-left" style="padding-top: 3px;">
                                             <h4 class="fw text-dark">{{ $video->user->channel->name }}</h4>
-                                            <h6 class="text-dark">{{ $subscribers ?? 0 }} Subscribers</h6>
+                                            <h6 class="text-dark subscribers-count">{{ $video->user->channel->manyUsers()->count() ?? 0 }} Subscribers</h6>
                                         </div>
                                         <br class="clear">
                                     </div>
                                 </a>
                             </div>
                             <div class="col-3 text-right">
-                                <a href="" class="btn btn-danger text-uppercase">Subscribe</a>
+                                @auth
+                                    <button class="btn subscribe text-uppercase {{ auth()->user()->manyChannels()->where('channel_id', $video->user->channel->id)->first() ? 'btn-secondary subscribed' : 'btn-danger' }}" data-id="{{ $video->user->channel->id }}">{{ auth()->user()->manyChannels()->where('channel_id', $video->user->channel->id)->first() ? 'Subscribed' : 'Subscribe' }}</button>
+                                @endauth
                             </div>
                         </div>
                         <div>
@@ -294,6 +296,67 @@
                     });
                 } else {
                     return false;
+                }
+            });
+
+
+            $('.subscribe').click(function() {
+                var channel_id = $(this).data('id');
+
+                if ($(this).hasClass('subscribed')) {
+                    if (confirm('Are you sure you want to unsubscribe?')) {
+                        $.ajax({
+                            url : "{{ route('channel.subscribe') }}",
+                            method : 'post',
+                            data : {
+                                "_token" : "{{ csrf_token() }}",
+                                channel_id : channel_id
+                            },
+                            dataType : 'json',
+                            success: function(response) {
+                                if (response.status == 'subscribed') {
+                                    $('.subscribe').removeClass('btn-danger');
+                                    $('.subscribe').addClass('btn-secondary');
+                                    $('.subscribe').addClass('subscribed');
+                                    $('.subscribe').html('Subscribed');
+                                    $('.subscribers-count').html(response.count + ' Subscribers');
+                                } else {
+                                    $('.subscribe').removeClass('btn-secondary');
+                                    $('.subscribe').addClass('btn-danger');
+                                    $('.subscribe').removeClass('subscribed');
+                                    $('.subscribe').html('Subscribe');
+                                    $('.subscribers-count').html(response.count + ' Subscribers');
+                                }
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                } else {
+                    $.ajax({
+                        url : "{{ route('channel.subscribe') }}",
+                        method : 'post',
+                        data : {
+                            "_token" : "{{ csrf_token() }}",
+                            channel_id : channel_id
+                        },
+                        dataType : 'json',
+                        success: function(response) {
+                            if (response.status == 'subscribed') {
+                                $('.subscribe').removeClass('btn-danger');
+                                $('.subscribe').addClass('btn-secondary');
+                                $('.subscribe').addClass('subscribed');
+                                $('.subscribe').html('Subscribed');
+                                    $('.subscribers-count').html(response.count + ' Subscribers');
+                            } else {
+                                $('.subscribe').removeClass('btn-secondary');
+                                $('.subscribe').addClass('btn-danger');
+                                $('.subscribe').removeClass('subscribed');
+                                $('.subscribe').html('Subscribe');
+                                    $('.subscribers-count').html(response.count + ' Subscribers');
+                            }
+                        }
+                    });
                 }
             });
         });

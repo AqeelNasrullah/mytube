@@ -66,34 +66,55 @@
 
                 if ($(this).hasClass('subscribed')) {
                     if (confirm('Are you sure you want to unsubscribe?')) {
-                        continue;
+                        $.ajax({
+                            url : "{{ route('channel.subscribe') }}",
+                            method : 'post',
+                            data : {
+                                "_token" : "{{ csrf_token() }}",
+                                channel_id : channel_id
+                            },
+                            dataType : 'json',
+                            success: function(response) {
+                                if (response.status == 'subscribed') {
+                                    $('.subscribe').removeClass('btn-danger');
+                                    $('.subscribe').addClass('btn-secondary');
+                                    $('.subscribe').addClass('subscribed');
+                                    $('.subscribe').html('Subscribed');
+                                } else {
+                                    $('.subscribe').removeClass('btn-secondary');
+                                    $('.subscribe').addClass('btn-danger');
+                                    $('.subscribe').removeClass('subscribed');
+                                    $('.subscribe').html('Subscribe');
+                                }
+                            }
+                        });
                     } else {
                         return false;
                     }
-                }
-
-                $.ajax({
-                    url : "{{ route('channel.subscribe') }}",
-                    method : 'post',
-                    data : {
-                        "_token" : "{{ csrf_token() }}",
-                        channel_id : channel_id
-                    },
-                    dataType : 'json',
-                    success: function(response) {
-                        if (response.status == 'subscribed') {
-                            $('.subscribe').removeClass('btn-danger');
-                            $('.subscribe').addClass('btn-secondary');
-                            $('.subscribe').addClass('subscribed');
-                            $('.subscribe').html('Subscribed');
-                        } else {
-                            $('.subscribe').removeClass('btn-secondary');
-                            $('.subscribe').addClass('btn-danger');
-                            $('.subscribe').removeClass('subscribed');
-                            $('.subscribe').html('Subscribe');
+                } else {
+                    $.ajax({
+                        url : "{{ route('channel.subscribe') }}",
+                        method : 'post',
+                        data : {
+                            "_token" : "{{ csrf_token() }}",
+                            channel_id : channel_id
+                        },
+                        dataType : 'json',
+                        success: function(response) {
+                            if (response.status == 'subscribed') {
+                                $('.subscribe').removeClass('btn-danger');
+                                $('.subscribe').addClass('btn-secondary');
+                                $('.subscribe').addClass('subscribed');
+                                $('.subscribe').html('Subscribed');
+                            } else {
+                                $('.subscribe').removeClass('btn-secondary');
+                                $('.subscribe').addClass('btn-danger');
+                                $('.subscribe').removeClass('subscribed');
+                                $('.subscribe').html('Subscribe');
+                            }
                         }
-                    }
-                });
+                    });
+                }
             });
         });
     </script>
