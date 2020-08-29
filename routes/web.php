@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'HomeController@index')->name('home.index');
 Route::get('search', 'HomeController@search')->name('home.search');
 
+Route::get('trending', 'HomeController@trending')->name('home.trending');
+Route::get('subscriptions', 'HomeController@subscriptions')->name('home.subscriptions');
+Route::get('history', 'HomeController@history')->name('home.history');
+
 // Login Routes
 Route::get('login', 'LoginController@index')->name('login.index');
 Route::post('login', 'LoginController@attemptLogin')->name('login.attemptLogin');
@@ -80,6 +84,34 @@ Route::get('replies/delete', function () {
     return redirect()->route('home.index');
 });
 Route::post('replies/delete', 'ReplyController@destroy')->name('reply.destroy');
+
+// Likes Routes
+Route::get('videos/like', function () {
+    return redirect()->route('home.index');
+});
+Route::post('videos/like', 'LikeController@store')->name('like.store');
+Route::get('comments/like', function () {
+    return redirect()->route('home.index');
+});
+Route::post('comments/like', 'LikeController@likeComment')->name('like.likeComment');
+Route::get('replies/like', function () {
+    return redirect()->route('home.index');
+});
+Route::post('replies/like', 'LikeController@likeReply')->name('like.likeReply');
+
+// Dislikes Routes
+Route::get('videos/dislike', function () {
+    return redirect()->route('home.index');
+});
+Route::post('videos/dislike', 'DislikeController@store')->name('dislike.store');
+Route::get('comments/dislike', function () {
+    return redirect()->route('home.index');
+});
+Route::post('comments/dislike', 'DislikeController@dislikeComment')->name('dislike.dislikeComment');
+Route::get('replies/dislike', function () {
+    return redirect()->route('home.index');
+});
+Route::post('replies/dislike', 'DislikeController@dislikeReply')->name('dislike.dislikeReply');
 
 // Role, Category and Country routes
 Route::get('guest/add', 'HomeController@guest');

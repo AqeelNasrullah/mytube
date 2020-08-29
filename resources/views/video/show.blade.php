@@ -6,7 +6,7 @@
 
 @section('style')
     <style>
-        .reply, .delete {cursor: pointer;}
+        .reply, .delete, .like-comment, .dislike-comment, .like-reply, .dislike-reply {cursor: pointer;}
     </style>
 @endsection
 
@@ -26,7 +26,9 @@
                             <h5>{{ $video->manyUsers()->count() ?? 0 }} Views | {{ date('F d, Y', strtotime($video->created_at)) }}</h5>
                         </div>
                         <div class="col-12 col-sm">
-                            <h5 class="text-right"><a href="" class="text-dark mr-3"><i class="fas fa-thumbs-up"></i> {{ $likes ?? 0 }}</a><a href="" class="text-dark"><i class="fas fa-thumbs-down"></i> {{ $dislikes ?? 0 }}</a></h5>
+                            <h5 class="text-right">
+                                <a href="" class="{{ $video->likes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-success' : 'text-dark' }} like-video mr-3" data-id="{{ $video->id }}"><i class="fas fa-thumbs-up"></i> <span class="likes-count">{{ $video->likes()->count() ?? 0 }}</span></a>
+                                <a href="" class="{{ $video->dislikes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-danger' : 'text-dark' }} dislike-video" data-id="{{ $video->id }}"><i class="fas fa-thumbs-down"></i> <span class="dislikes-count">{{ $video->dislikes()->count() ?? 0 }}</span></a></h5>
                         </div>
                     </div>
                     <hr>
@@ -96,8 +98,8 @@
                                     <p class="mb-1">{{ $comment->body }}</p>
                                     <p class="mb-0 d-inline">
                                         <span class="mr-3">{{ $comment->created_at->diffForHumans() }}</span>
-                                        <span class="like mr-3" id="like_{{ $comment->id }}"><i class="fas fa-thumbs-up"></i> 0</span>
-                                        <span class="dislike mr-3" id="dislike_{{ $comment->id }}"><i class="fas fa-thumbs-down"></i> 0</span>
+                                        <span class="like_comment_{{ $comment->id }} {{ $comment->likes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-success' : 'text-dark' }} like-comment mr-3" data-id="{{ $comment->id }}"><i class="fas fa-thumbs-up"></i> <span class="comment-likes-count-{{ $comment->id }}">{{ $comment->likes()->count() ?? 0 }}</span></span>
+                                        <span class="dislike_comment_{{ $comment->id }} {{ $comment->dislikes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-danger' : 'text-dark' }} dislike-comment mr-3" data-id="{{ $comment->id }}"><i class="fas fa-thumbs-down"></i> <span class="comment-dislikes-count-{{ $comment->id }}">{{ $comment->dislikes()->count() ?? 0 }}</span></span>
                                         @if (auth()->check())
                                         <span class="reply mr-3 fw text-uppercase" data-id="{{ $comment->id }}"><i class="fas fa-reply"></i> Reply</span>
                                         @if (auth()->user()->id == $comment->user_id)
@@ -138,8 +140,8 @@
                                             <p class="mb-1">{{ $reply->body }}</p>
                                             <p class="mb-0 d-inline">
                                                 <span class="mr-3">{{ $reply->created_at->diffForHumans() }}</span>
-                                                <span class="like mr-3" id="like_{{ $comment->id }}"><i class="fas fa-thumbs-up"></i> 0</span>
-                                                <span class="dislike mr-3" id="dislike_{{ $comment->id }}"><i class="fas fa-thumbs-down"></i> 0</span>
+                                                <span class="like-reply-{{ $reply->id }} {{ $reply->likes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-success' : 'text-dark' }} like-reply mr-3" data-id="{{ $reply->id }}"><i class="fas fa-thumbs-up"></i> <span class="reply-likes-count-{{ $reply->id }}">{{ $reply->likes()->count() ?? 0 }}</span></span>
+                                                <span class="dislike-reply-{{ $reply->id }} {{ $reply->dislikes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-danger' : 'text-dark' }} dislike-reply mr-3" data-id="{{ $reply->id }}"><i class="fas fa-thumbs-down"></i> <span class="reply-dislikes-count-{{ $reply->id }}">{{ $reply->dislikes()->count() ?? 0 }}</span></span>
                                                 @if (auth()->check())
                                                 <span class="reply mr-3 fw text-uppercase" data-id="{{ $comment->id }}"><i class="fas fa-reply"></i> Reply</span>
                                                 @if (auth()->user()->id == $reply->user_id)
@@ -347,17 +349,201 @@
                                 $('.subscribe').addClass('btn-secondary');
                                 $('.subscribe').addClass('subscribed');
                                 $('.subscribe').html('Subscribed');
-                                    $('.subscribers-count').html(response.count + ' Subscribers');
+                                $('.subscribers-count').html(response.count + ' Subscribers');
                             } else {
                                 $('.subscribe').removeClass('btn-secondary');
                                 $('.subscribe').addClass('btn-danger');
                                 $('.subscribe').removeClass('subscribed');
                                 $('.subscribe').html('Subscribe');
-                                    $('.subscribers-count').html(response.count + ' Subscribers');
+                                $('.subscribers-count').html(response.count + ' Subscribers');
                             }
                         }
                     });
                 }
+            });
+
+            $('.like-video').click(function(e) {
+                e.preventDefault();
+                var video_id = $(this).data('id');
+
+                $.ajax({
+                    url : "{{ route('like.store') }}",
+                    method : 'post',
+                    data : {
+                        "_token" : "{{ csrf_token() }}",
+                        video_id : video_id
+                    },
+                    dataType : 'json',
+                    success : function(response) {
+                        if (response.status == 'unliked') {
+                            $('.like-video').removeClass('text-success');
+                            $('.like-video').addClass('text-dark');
+                            $('.likes-count').html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#like-toast').toast({delay : 5000});
+                            $('#like-toast').toast('show');
+                        } else {
+                            $('.like-video').removeClass('text-dark');
+                            $('.like-video').addClass('text-success');
+                            $('.likes-count').html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#like-toast').toast({delay : 5000});
+                            $('#like-toast').toast('show');
+                        }
+                    }
+                });
+            });
+
+            $('.dislike-video').click(function(e) {
+                e.preventDefault();
+                var video_id = $(this).data('id');
+
+                $.ajax({
+                    url : "{{ route('dislike.store') }}",
+                    method : 'post',
+                    data : {
+                        "_token" : "{{ csrf_token() }}",
+                        video_id : video_id
+                    },
+                    dataType : 'json',
+                    success : function(response) {
+                        if (response.status == 'undisliked') {
+                            $('.dislike-video').removeClass('text-danger');
+                            $('.dislike-video').addClass('text-dark');
+                            $('.dislikes-count').html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#dislike-toast').toast({delay : 5000});
+                            $('#dislike-toast').toast('show');
+                        } else {
+                            $('.dislike-video').removeClass('text-dark');
+                            $('.dislike-video').addClass('text-danger');
+                            $('.dislikes-count').html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#dislike-toast').toast({delay : 5000});
+                            $('#dislike-toast').toast('show');
+                        }
+                    }
+                });
+            });
+
+            $('#comments').on('click', '.like-comment', function() {
+                var comment_id = $(this).data('id');
+                $.ajax({
+                    url : "{{ route('like.likeComment') }}",
+                    method : 'post',
+                    data : {
+                        "_token" : "{{ csrf_token() }}",
+                        comment_id : comment_id
+                    },
+                    dataType : 'json',
+                    success : function(response) {
+                        if (response.status == 'unliked') {
+                            $('.like-comment-' + comment_id).removeClass('text-success');
+                            $('.like-comment-' + comment_id).addClass('text-dark');
+                            $('.comment-likes-count-' + comment_id).html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#comment-like-toast').toast({delay : 5000});
+                            $('#comment-like-toast').toast('show');
+                        } else {
+                            $('.like-comment-' + comment_id).removeClass('text-dark');
+                            $('.like-comment-' + comment_id).addClass('text-success');
+                            $('.comment-likes-count-' + comment_id).html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#comment-like-toast').toast({delay : 5000});
+                            $('#comment-like-toast').toast('show');
+                        }
+                    }
+                });
+            });
+
+            $('#comments').on('click', '.dislike-comment', function() {
+                var comment_id = $(this).data('id');
+                $.ajax({
+                    url : "{{ route('dislike.dislikeComment') }}",
+                    method : 'post',
+                    data : {
+                        "_token" : "{{ csrf_token() }}",
+                        comment_id : comment_id
+                    },
+                    dataType : 'json',
+                    success : function(response) {
+                        if (response.status == 'undisliked') {
+                            $('.dislike-comment-' + comment_id).removeClass('text-danger');
+                            $('.dislike-comment-' + comment_id).addClass('text-dark');
+                            $('.comment-dislikes-count-' + comment_id).html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#comment-dislike-toast').toast({delay : 5000});
+                            $('#comment-dislike-toast').toast('show');
+                        } else {
+                            $('.dislike-comment-' + comment_id).removeClass('text-dark');
+                            $('.dislike-comment-' + comment_id).addClass('text-danger');
+                            $('.comment-dislikes-count-' + comment_id).html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#comment-dislike-toast').toast({delay : 5000});
+                            $('#comment-dislike-toast').toast('show');
+                        }
+                    }
+                });
+            });
+
+            $('#comments').on('click', '.like-reply', function() {
+                var reply_id = $(this).data('id');
+                $.ajax({
+                    url : "{{ route('like.likeReply') }}",
+                    method : 'post',
+                    data : {
+                        "_token" : "{{ csrf_token() }}",
+                        reply_id : reply_id
+                    },
+                    dataType : 'json',
+                    success : function(response) {
+                        if (response.status == 'unliked') {
+                            $('.like-reply-' + reply_id).removeClass('text-success');
+                            $('.like-reply-' + reply_id).addClass('text-dark');
+                            $('.reply-likes-count-' + reply_id).html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#reply-like-toast').toast({delay : 5000});
+                            $('#reply-like-toast').toast('show');
+                        } else {
+                            $('.like-reply-' + reply_id).removeClass('text-dark');
+                            $('.like-reply-' + reply_id).addClass('text-success');
+                            $('.reply-likes-count-' + reply_id).html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#reply-like-toast').toast({delay : 5000});
+                            $('#reply-like-toast').toast('show');
+                        }
+                    }
+                });
+            });
+
+            $('#comments').on('click', '.dislike-reply', function() {
+                var reply_id = $(this).data('id');
+                $.ajax({
+                    url : "{{ route('dislike.dislikeReply') }}",
+                    method : 'post',
+                    data : {
+                        "_token" : "{{ csrf_token() }}",
+                        reply_id : reply_id
+                    },
+                    dataType : 'json',
+                    success : function(response) {
+                        if (response.status == 'undisliked') {
+                            $('.dislike-reply-' + reply_id).removeClass('text-danger');
+                            $('.dislike-reply-' + reply_id).addClass('text-dark');
+                            $('.reply-dislikes-count-' + reply_id).html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#reply-dislike-toast').toast({delay : 5000});
+                            $('#reply-dislike-toast').toast('show');
+                        } else {
+                            $('.dislike-reply-' + reply_id).removeClass('text-dark');
+                            $('.dislike-reply-' + reply_id).addClass('text-danger');
+                            $('.reply-dislikes-count-' + reply_id).html(response.count);
+                            $('#toast').html(response.toast);
+                            $('#reply-dislike-toast').toast({delay : 5000});
+                            $('#reply-dislike-toast').toast('show');
+                        }
+                    }
+                });
             });
         });
     </script>

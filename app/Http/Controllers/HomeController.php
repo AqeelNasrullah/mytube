@@ -9,6 +9,7 @@ use App\Role;
 use App\User;
 use App\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
@@ -34,6 +35,24 @@ class HomeController extends Controller
         } else {
             return redirect()->route('home.index');
         }
+    }
+
+    public function trending()
+    {
+        $videos = Video::where('status', 'public')->inRandomOrder()->limit(10)->get();
+        return view('trending', ['videos' => $videos]);
+    }
+
+    public function subscriptions()
+    {
+        $channels = Auth::user()->manyChannels()->inRandomOrder()->get();
+        return view('subscriptions', ['channels' => $channels]);
+    }
+
+    public function history()
+    {
+        $videos = Auth::user()->manyVideos()->orderBy('user_video.created_at', 'desc')->paginate(10);
+        return view('history', ['videos' => $videos]);
     }
 
 

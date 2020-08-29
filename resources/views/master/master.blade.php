@@ -108,39 +108,31 @@
         <main>
             <aside class="side-menu float-left" style="position: sticky;top: 60px;left: 0px;z-index:90;">
                 <ul style="border-bottom: 1px solid lightgray;">
-                    <li class="p-2"><a href="" class="text-dark d-block"><span><i class="fas fa-home"></i></span>
+                    <li class="p-2"><a href="{{ route('home.index') }}" class="text-dark d-block"><span><i class="fas fa-home"></i></span>
                             Home</a></li>
-                    <li class="p-2"><a href="" class="text-dark d-block"><span><i class="fas fa-fire"></i></span>
+                    <li class="p-2"><a href="{{ route('home.trending') }}" class="text-dark d-block"><span><i class="fas fa-fire"></i></span>
                             Trending</a></li>
-                    <li class="p-2"><a href="" class="text-dark d-block"><span><i class="fas fa-align-left"></i></span>
+                    <li class="p-2"><a href="{{ route('home.subscriptions') }}" class="text-dark d-block"><span><i class="fas fa-align-left"></i></span>
                             Subscriptions</a></li>
                 </ul>
                 <ul style="border-bottom: 1px solid lightgray;">
-                    <li class="p-2"><a href="" class="text-dark d-block"><span><i class="fas fa-history"></i></span>
+                    <li class="p-2"><a href="{{ route('home.history') }}" class="text-dark d-block"><span><i class="fas fa-history"></i></span>
                             History</a></li>
-                    <li class="p-2"><a href="" class="text-dark d-block"><span><i class="fas fa-play"></i></span> Your
+                    <li class="p-2"><a href="{{ route('channel.show', base64_encode((auth()->user()->channel->id * 1234554321) / 67890)) }}" class="text-dark d-block"><span><i class="fas fa-play"></i></span> Your
                             Videos</a></li>
-                    <li class="p-2"><a href="" class="text-dark d-block"><span><i class="fas fa-thumbs-up"></i></span>
-                            Liked Videos</a></li>
                 </ul>
                 @auth
                 <ul style="border-bottom: 1px solid lightgray;">
                     <h6 class="p-2 mb-0 text-uppercase">Subscriptions</h6>
-                    <li class="p-2"><a href="" class="text-dark d-block" style="font-size: large;"><span
-                                style="margin-right: 3px;"><img src="{{ asset('images/avatars/user.webp') }}"
-                                    width="25px" height="25px" style="border-radius: 100%;overflow: hidden;"
-                                    alt=""></span> Ducky
-                            Bhai</a></li>
-                    <li class="p-2"><a href="" class="text-dark d-block" style="font-size: large;"><span
-                                style="margin-right: 3px;"><img src="{{ asset('images/avatars/user.webp') }}"
-                                    width="25px" height="25px" style="border-radius: 100%;overflow: hidden;"
-                                    alt=""></span> Ducky
-                            Extra</a></li>
-                    <li class="p-2"><a href="" class="text-dark d-block" style="font-size: large;"><span
-                                style="margin-right: 3px;"><img src="{{ asset('images/avatars/user.webp') }}"
-                                    width="25px" height="25px" style="border-radius: 100%;overflow: hidden;"
-                                    alt=""></span> Khujlyee
-                            Family</a>
+
+                    @forelse (auth()->user()->manyChannels()->get() as $channel)
+                    <li class="p-2"><a href="{{ route('channel.show', base64_encode(($channel->id * 1234554321) / 67890)) }}" class="text-dark d-block" style="font-size: large;"><span
+                        style="margin-right: 3px;"><img src="{{ asset('images/avatars/' . $channel->avatar) }}"
+                            width="30px" height="30px" style="border-radius: 100%;overflow: hidden;"
+                            alt=""></span> {{ $channel->name }}</a></li>
+                    @empty
+                        <li class="dropdown-item text-center">No Subscribed Channel Yet.</li>
+                    @endforelse
                 </ul>
                 @endauth
                 <div class="p-2">

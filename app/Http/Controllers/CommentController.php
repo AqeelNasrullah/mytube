@@ -74,8 +74,9 @@ class CommentController extends Controller
                                 <h5 class="fw mb-1">'. $reply->user->channel->name .' '. (($reply->user_id == $video->user_id) ? '<small>(Owner)</small>' : '') .'</h5>
                                 <p class="mb-1">'. $reply->body .'</p>
                                 <p class="mb-0 d-inline">
-                                    <span class="like mr-3" id="like_'. $comment->id .'"><i class="fas fa-thumbs-up"></i> 0</span>
-                                    <span class="dislike mr-3" id="dislike_'. $comment->id .'"><i class="fas fa-thumbs-down"></i> 0</span>
+                                <span class="mr-3">' . $reply->created_at->diffForHumans() . '</span>
+                                    <span class="like-reply-' . $reply->id . ' ' . ($reply->likes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-success' : 'text-dark') . ' like-reply mr-3" data-id="'. $reply->id .'"><i class="fas fa-thumbs-up"></i> <span class="reply-likes-count-' . $reply->id . '">' . ($reply->likes()->count() ?? 0) . '</span></span>
+                                    <span class="dislike-reply-' . $reply->id . ' ' . ($reply->dislikes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-danger' : 'text-dark') . ' dislike-reply mr-3" data-id="'. $reply->id .'"><i class="fas fa-thumbs-down"></i>  <span class="reply-dislikes-count-' . $reply->id . '">' . ($reply->dislikes()->count() ?? 0) . '</span></span>
                                     <span class="reply mr-3 fw text-uppercase" data-id="'. $comment->id .'"><i class="fas fa-reply"></i> Reply</span>
                                     ' . $reply_delete_btn .'
                                 </p>
@@ -98,8 +99,9 @@ class CommentController extends Controller
                         <h5 class="fw mb-1">'. $comment->user->channel->name .' '. (($comment->user_id == $video->user_id) ? '<small>(Owner)</small>' : '') .'</h5>
                         <p class="mb-1">'. $comment->body .'</p>
                         <p class="mb-0 d-inline">
-                            <span class="like mr-3" id="like_'. $comment->id .'"><i class="fas fa-thumbs-up"></i> 0</span>
-                            <span class="dislike mr-3" id="dislike_'. $comment->id .'"><i class="fas fa-thumbs-down"></i> 0</span>
+                        <span class="mr-3">' . $comment->created_at->diffForHumans() . '</span>
+                        <span class="like-comment-' . $comment->id . ' ' . ($comment->likes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-success' : 'text-dark') . ' like-comment mr-3" data-id="'. $comment->id .'"><i class="fas fa-thumbs-up"></i> <span class="comment-likes-count-' . $comment->id . '">' . ($comment->likes()->count() ?? 0) . '</span></span>
+                        <span class="dislike-comment-' . $comment->id . ' ' . ($comment->dislikes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-danger' : 'text-dark') . ' dislike-comment mr-3" data-id="'. $comment->id .'"><i class="fas fa-thumbs-down"></i>  <span class="comment-dislikes-count-' . $comment->id . '">' . ($comment->dislikes()->count() ?? 0) . '</span></span>
                             <span class="reply mr-3 fw text-uppercase" data-id="'. $comment->id .'"><i class="fas fa-reply"></i> Reply</span>
                             ' . $comment_delete_btn . '
                         </p>
@@ -203,8 +205,9 @@ class CommentController extends Controller
                                 <h5 class="fw mb-1">'. $reply->user->channel->name .' '. (($reply->user_id == $video->user_id) ? '<small>(Owner)</small>' : '') .'</h5>
                                 <p class="mb-1">'. $reply->body .'</p>
                                 <p class="mb-0 d-inline">
-                                    <span class="like mr-3" id="like_'. $comment->id .'"><i class="fas fa-thumbs-up"></i> 0</span>
-                                    <span class="dislike mr-3" id="dislike_'. $comment->id .'"><i class="fas fa-thumbs-down"></i> 0</span>
+                                <span class="mr-3">' . $reply->created_at->diffForHumans() . '</span>
+                                <span class="like-reply-' . $reply->id . ' ' . ($reply->likes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-success' : 'text-dark') . ' like-reply mr-3" data-id="'. $reply->id .'"><i class="fas fa-thumbs-up"></i> <span class="reply-likes-count-' . $reply->id . '">' . ($reply->likes()->count() ?? 0) . '</span></span>
+                                <span class="dislike-reply-' . $reply->id . ' ' . ($reply->dislikes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-danger' : 'text-dark') . ' dislike-reply mr-3" data-id="'. $reply->id .'"><i class="fas fa-thumbs-down"></i>  <span class="reply-dislikes-count-' . $reply->id . '">' . ($reply->dislikes()->count() ?? 0) . '</span></span>
                                     <span class="reply mr-3 fw text-uppercase" data-id="'. $comment->id .'"><i class="fas fa-reply"></i> Reply</span>
                                     ' . $reply_delete_btn .'
                                 </p>
@@ -227,8 +230,9 @@ class CommentController extends Controller
                         <h5 class="fw mb-1">'. $comment->user->channel->name .' '. (($comment->user_id == $video->user_id) ? '<small>(Owner)</small>' : '') .'</h5>
                         <p class="mb-1">'. $comment->body .'</p>
                         <p class="mb-0 d-inline">
-                            <span class="like mr-3" id="like_'. $comment->id .'"><i class="fas fa-thumbs-up"></i> 0</span>
-                            <span class="dislike mr-3" id="dislike_'. $comment->id .'"><i class="fas fa-thumbs-down"></i> 0</span>
+                        <span class="mr-3">' . $comment->created_at->diffForHumans() . '</span>
+                        <span class="like-comment-' . $comment->id . ' ' . ($comment->likes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-success' : 'text-dark') . ' like-comment mr-3" data-id="'. $comment->id .'"><i class="fas fa-thumbs-up"></i> <span class="comment-likes-count-' . $comment->id . '">' . ($comment->likes()->count() ?? 0) . '</span></span>
+                        <span class="dislike-comment-' . $comment->id . ' ' . ($comment->dislikes()->where('user_id', (auth()->user()->id ?? App\User::where('email', 'guest@mytube.com')->first()->id))->first() ? 'text-danger' : 'text-dark') . ' dislike-comment mr-3" data-id="'. $comment->id .'"><i class="fas fa-thumbs-down"></i>  <span class="comment-dislikes-count-' . $comment->id . '">' . ($comment->dislikes()->count() ?? 0) . '</span></span>
                             <span class="reply mr-3 fw text-uppercase" data-id="'. $comment->id .'"><i class="fas fa-reply"></i> Reply</span>
                             ' . $comment_delete_btn . '
                         </p>
@@ -256,11 +260,7 @@ class CommentController extends Controller
                 </div>';
                 }
 
-                $toast = '<div class="toast fade bg-success" id="comment-toast">
-                    <div class="toast-body text-light">Comment deleted successfully.</div>
-                </div>';
-
-                return response()->json(['output' => $data, 'comments' => ($video->comments()->count() . ' Comments'), 'toast' => $toast]);
+                return response()->json(['output' => $data, 'comments' => ($video->comments()->count() . ' Comments')]);
             } else {
                 return response()->json(['output' => 'Something went wrong.', 'comments' => ($video->comments()->count() . ' Comments')]);
             }
